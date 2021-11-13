@@ -4,7 +4,7 @@ import App from './App.vue'
 // 引入vue的路由插件
 import VueRouter from 'vue-router'
 // 引入路由器
-// import router from './router'
+import router from './router'
 // 引入elementui插件
 import ElementUI from 'element-ui';
 // 引入完整样式
@@ -19,5 +19,5 @@ Vue.config.productionTip = false
 
 new Vue({
   render: h => h(App),
-  // router: router
+  router: router
 }).$mount('#app')
