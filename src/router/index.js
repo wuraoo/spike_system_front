@@ -2,6 +2,7 @@
 import VueRouter from "vue-router";
 // 引入組件
 import Login from "../pages/Login.vue"
+import Show from '../pages/Show.vue'
 
 // 创建一个路由器
 const router = new VueRouter({
@@ -13,6 +14,11 @@ const router = new VueRouter({
             path: '/login',
             component: Login,
             meta: {title: '登录'}
+        },
+        {
+            name: 'show',
+            path: '/show',
+            component: Show
         },
     ]
 })

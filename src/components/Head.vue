@@ -24,7 +24,7 @@
             name:'login',
           }" 
           class="el-icon-s-custom login-a">
-          登录
+          {{name}}
           </router-link>
         </div>
     </el-menu>
@@ -37,10 +37,17 @@
     data() {
         return {
             activeIndex2: "1",
+            name: '登录'
         };
     },
     methods: {
 
+    },
+    mounted() {
+      // 为登录绑定事件（登陆成功之后调用，显示用户名）
+      this.$bus.$on('showUserName',(username)=>{
+        this.name = username
+      })
     },
     };
 </script>
