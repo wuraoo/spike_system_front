@@ -9,11 +9,17 @@ import router from './router'
 import ElementUI from 'element-ui';
 // 引入完整样式
 import 'element-ui/lib/theme-chalk/index.css';
+// 引入vueCookie
+import VueCookies from "vue-cookies";
+
 
 // 应用element插件
 Vue.use(ElementUI)
 // 应用路由插件
 Vue.use(VueRouter)
+// 应用vue插件
+Vue.use(VueCookies);
+
 
 Vue.config.productionTip = false
 

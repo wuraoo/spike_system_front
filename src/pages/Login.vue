@@ -50,6 +50,8 @@ export default {
               this.$message('密码不能为空')
           }else{
                 let data = {"nickname": this.user.nickname, password: this.user.password}
+                // 携带cookie
+                axios.defaults.withCredentials=true;
                 // 发送ajax请求
                 axios.post('http://localhost:8001/spike_system/user/login',data).then(
                     res =>{
@@ -59,6 +61,9 @@ export default {
                             this.$message('登录成功')
                             // 成功之后触发事件，将右上角显示用户名称
                             this.$bus.$emit("showUserName",res.data.data.user.nickname)
+                            // 查看cookie
+                            // console.log(document.cookie.match("token"))
+
                             // 成功后体跳转页面
                             this.$router.push('/show')
                         }else{
