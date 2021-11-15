@@ -17,11 +17,13 @@ export default {
 
 <style>
 .my_main{
+  text-align: center;
   position: absolute;
   top: 60px;
   left: 15%;
   height: 100%;
   width: 85%;
-  background-color: #9E9C9C;
+  background-image: url('../assets/Main-back.jpg');
+  background-size: 100% 100%;
 }
 </style>

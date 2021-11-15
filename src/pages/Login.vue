@@ -1,4 +1,5 @@
 <template>
+<div class="login-outer">
   <div class="login-box">
     <el-form
       status-icon
@@ -27,10 +28,12 @@
       </el-form-item>
     </el-form>
   </div>
+</div>
 </template>
 
 <script>
 import axios from 'axios'
+import '../assets/my_input.css'
 export default {
   name: "Login",
   data() {
@@ -86,13 +89,20 @@ export default {
 </script>
 
 <style>
+.login-outer{
+  width: 100%;
+  height: 100%;
+  background-image: url("../assets/login-back.jpg");
+  background-size: 100% 100%;
+}
 .login-box {
   position: absolute;
   top: 30%;
   left: 30%;
   height: 200px;
   width: 500px;
-  background-color: white;
   text-align: center;
+  background-image: url("../assets/login.jpg");
+  background-size: 100% 100%;
 }
 </style>
