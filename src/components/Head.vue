@@ -8,7 +8,14 @@
       text-color="#fff"
       active-text-color="#ffd04b"
     >
-      <el-menu-item index="1">主页</el-menu-item>
+      <el-menu-item index="1">
+        <router-link :to="{
+          name: 'show'
+        }"
+        class="login-a">
+        主页
+      </router-link>
+      </el-menu-item>
       <el-submenu index="2">
         <template slot="title">推荐商品</template>
         <el-menu-item index="2-1">推荐1</el-menu-item>

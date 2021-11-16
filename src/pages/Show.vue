@@ -1,13 +1,36 @@
 <template>
   <div class="show">
-    <ul id="list">
-      <!-- 显示商品信息 -->
-      <li v-for="good in goods" :key="good.id">
-        <p><a href="#" v-text="good.goodsName"></a></p>
-        <img :src="good.goodsImg" />
-        <p>促销价：{{good.goodsPrice}} - 库存：{{good.goodsStock}}</p>
-      </li>
-    </ul>
+    <el-table :data="goods" style="width: 100%">
+      <el-table-column prop="goodsName" label="名称" width="180">
+      </el-table-column>
+      <el-table-column prop="goodsImg" label="图片" width="180">
+        <!-- 图片的显示:使用时只需要注意scope.row.goodsImg中的goodsImg改为自己数据中的属性名称即可 -->
+        <template slot-scope="scope">
+          <img :src="scope.row.goodsImg" min-width="150" height="150" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="goodsTitle" label="描述"> </el-table-column>
+      <el-table-column prop="goodsPrice" label="价格"> </el-table-column>
+      <el-table-column prop="goodsStock" label="库存"> </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="">
+          <el-button type="danger" icon="el-icon-thumb">查看详情</el-button>
+          <el-button type="warning" icon="el-icon-bank-card"
+            >立即购买</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <el-pagination
+      background
+      layout="prev, pager, next"
+      :total="total"
+      :page-size="page_size"
+      :current-page="currentpage"
+      @current-change="handleCurrentChange"
+    >
+    </el-pagination>
   </div>
 </template>
 
@@ -18,27 +41,44 @@ export default {
   data() {
     return {
       goods: [],
+      page_size: 4,
+      total: 0,
+      currentpage: 1
     };
   },
-  created() {
-    // 携带cookie
-    axios.defaults.withCredentials = true;
-    axios
-      .get("http://localhost:8001/spike_system/goods/info?pageNum=1&pageSize=4")
-      .then(
-        (req) => {
-          console.log(req.data);
-          // 请求成功
-          if (req.data.code === 20000) {
-            this.goods = req.data.data.goods.records;
-          } else {
-            this.$message(req.data.message);
+  methods: {
+    // 当前变动是触发函数
+    handleCurrentChange(val) {
+      // 再次调用请求获取数据(其实可以不这样做，因为数据已近全部获取到了)
+      this.getData(val)
+    },
+    getData(curr) {
+      // 携带cookie
+      axios.defaults.withCredentials = true;
+      axios.get(`http://localhost:8001/spike_system/goods/info?pageNum=${curr}&pageSize=4`).then(
+          (req) => {
+            console.log(req.data);
+            // 请求成功
+            if (req.data.code === 20000) {
+              // 设置数据到data
+              this.goods = req.data.data.goods.records;
+              // 设置总数据数
+              this.total = req.data.data.goods.total;
+            } else {
+              this.$message(req.data.message);
+              this.$router.push("/error-page");
+            }
+          },
+          (error) => {
+            console.log(error.message);
+            this.$message("系统错误")
           }
-        },
-        (error) => {
-          console.log(error.message);
-        }
-      );
+        );
+    },
+  },
+  created() {
+    // 首次调用请求，获取数据
+    this.getData(1)
   },
 };
 </script>
@@ -47,22 +87,6 @@ export default {
 .show {
   height: 100%;
   width: 100%;
-  background-image: url("../assets/show-back.jpg");
-  background-size: 100% 100%;
-}
-
-#list li {
-  text-decoration: none; /*去掉前面的圆点*/
-  list-style: none;
-  float: left;
-  margin-left: 150px;
-  margin-top: 200px;
-  border: 1px solid #ffffff;
-  background-color: #FC5531;
-}
-
-#list li p{
-  font-size: 20px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  background-color: white;
 }
 </style>

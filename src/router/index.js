@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 // 引入組件
 import Login from "../pages/Login.vue"
 import Show from '../pages/Show.vue'
+import Error_Page from '../pages/Error.vue'
 
 // 创建一个路由器
 const router = new VueRouter({
@@ -20,6 +21,11 @@ const router = new VueRouter({
             path: '/show',
             component: Show
         },
+        {
+            name: 'error-page',
+            path: '/error',
+            component: Error_Page
+        }
     ]
 })
 

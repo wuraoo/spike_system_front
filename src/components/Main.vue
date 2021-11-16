@@ -23,7 +23,7 @@ export default {
   left: 15%;
   height: 100%;
   width: 85%;
-  background-image: url('../assets/Main-back.jpg');
+  background-image: url('../assets/Main-back.png');
   background-size: 100% 100%;
 }
 </style>
