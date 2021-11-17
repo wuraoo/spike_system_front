@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import Login from "../pages/Login.vue"
 import Show from '../pages/Show.vue'
 import Error_Page from '../pages/Error.vue'
+import Spike from '../pages/Spike.vue'
 
 // 创建一个路由器
 const router = new VueRouter({
@@ -25,6 +26,11 @@ const router = new VueRouter({
             name: 'error-page',
             path: '/error',
             component: Error_Page
+        },
+        {
+            name: "spike",
+            path: '/spike',
+            component: Spike
         }
     ]
 })
