@@ -1,10 +1,11 @@
 <template>
   <div>
-    <div v-if="!showOver">
+    <div v-if="showOver === 0">
       <div>距离活动开始还剩</div>
       <div>{{ dayNum }}天{{ hourNum }}时{{ minuteNum }}分{{ secondNum }}秒</div>
     </div>
-    <div v-else>来晚了~活动已结束~</div>
+    <div v-else-if="showOver === 2">来晚了~活动已结束~</div>
+    <div v-else>活动正在进行~</div>
   </div>
 </template>
 
@@ -22,7 +23,7 @@ export default {
       seconds: 0,
       timeSetInterval: null,
       showTimeDown: false,
-      showOver: false,
+      showOver: 0, //0：未开始  1:正在进行  2：已结束
     };
   },
   methods: {
@@ -63,15 +64,18 @@ export default {
     // 判断是否还没开始
     if (moment(new Date()).isBefore(this.startTime)) {
       this.showTimeDown = true;
-      // 给父组件传递false表示不能购买
-      // this.btnType(false)
+      this.showOver = 0;
+      console.log(0)
       this.timeDown();
     }
     // 如果超过了结束时间则显示已结束
-    if (moment(new Date()).isAfter(this.endTime)) {
-      // 给父组件传递false表示不能购买
-      // this.btnType(false)
-      this.showOver = true;
+    else if (moment(new Date()).isAfter(this.endTime)) {
+      this.showOver = 2;
+      console.log(2)
+    }
+    else{
+      this.showOver = 1;
+      console.log(1)
     }
   },
 };

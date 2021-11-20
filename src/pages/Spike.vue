@@ -13,20 +13,29 @@
       <el-table-column prop="goodPrice" label="原价"> </el-table-column>
       <el-table-column prop="skPrice" label="秒杀价"> </el-table-column>
       <el-table-column prop="skStock" label="库存"> </el-table-column>
-      <el-table-column prop="startTime" label="开始时间"> 
+      <el-table-column prop="startTime" label="开始时间">
         <template slot-scope="scope">
           <!-- 传开始时间给子组件 -->
-          <CountDown :startTime="scope.row.startTime" :endTime="scope.row.endTime"></CountDown>
-        </template> 
+          <CountDown
+            :startTime="scope.row.startTime"
+            :endTime="scope.row.endTime"
+          ></CountDown>
+        </template>
       </el-table-column>
-      <el-table-column prop="endTime" label="结束时间"> 
+      <el-table-column prop="endTime" label="结束时间">
         <template slot-scope="scope">
           <OverTime :endTime="scope.row.endTime"></OverTime>
-        </template> 
+        </template>
       </el-table-column>
       <el-table-column label="操作">
-        <template slot-scope="">
-          <el-button type="danger" icon="el-icon-thumb" @click="submit">立即抢购</el-button>
+        <template slot-scope="scope">
+          <el-button
+            :disabled="isCanBuy(scope.row.startTime ,scope.row.endTime)"
+            type="danger"
+            icon="el-icon-thumb"
+            @click="submit(scope.row.goodId, currentpage)"
+            >立即抢购</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -45,17 +54,20 @@
 
 <script>
 import axios from "axios";
-import CountDown from '../components/CountDown.vue'
-import OverTime from '../components/OverTime.vue'
+import moment from "moment";
+import CountDown from "../components/CountDown.vue";
+import OverTime from "../components/OverTime.vue";
 export default {
   name: "Spike",
-  components: {CountDown,OverTime},
+  components: { CountDown, OverTime },
   data() {
     return {
       goods: [],
       page_size: 4,
       total: 0,
       currentpage: 1,
+      // 标志按钮是否可以开始抢购
+      isStart: true,
     };
   },
   methods: {
@@ -64,12 +76,12 @@ export default {
       // 再次调用请求获取数据(其实可以不这样做，因为数据已近全部获取到了)
       this.getData(val);
     },
-    getData(curr) {
+    getData() {
       // 携带cookie
       axios.defaults.withCredentials = true;
       axios.get(`http://localhost:8001/spike_system/skgoods/info`).then(
         (req) => {
-          console.log(curr, req.data);
+          // console.log(curr, req.data);
           // 请求成功
           if (req.data.code === 20000) {
             // 设置数据到data
@@ -95,9 +107,48 @@ export default {
     //     this.btnColor = "info"
     //   }
     // },
-    submit(){
-      alert(1)
-    }
+    submit(goodId, curr) {
+      axios.defaults.withCredentials = true;
+      axios
+        .get(`http://localhost:8001/spike_system/skorder/buy/${goodId}`)
+        .then(
+          (req) => {
+            // console.log(curr, req);
+            // 请求成功
+            if (req.data.code === 20000) {
+              this.$message("购买成功~");
+              // 再次查询
+              this.getData(curr);
+            }
+            // 未登录
+            else if (req.data.code === 22222) {
+              this.$message(req.data.message);
+              // 跳转登录
+              this.$router.push("/login");
+            }
+            // 其他错误
+            else {
+              this.$message("购买失败: " + req.data.message);
+            }
+          },
+          (error) => {
+            console.log(error.message);
+            this.$message("系统错误");
+          }
+        );
+    },
+    // 该方法用于改变购买按钮状态（是否可点击）
+    isCanBuy(startTime,endTime) {
+      if (moment(new Date()).isBefore(startTime)) {
+        return true
+      }
+      // 如果超过了结束时间则显示已结束
+      else if (moment(new Date()).isAfter(endTime)) {
+        return true
+      } else {
+        return false
+      }
+    },
   },
   created() {
     // 首次调用请求，获取数据

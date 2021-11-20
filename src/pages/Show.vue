@@ -13,9 +13,9 @@
       <el-table-column prop="goodsPrice" label="价格"> </el-table-column>
       <el-table-column prop="goodsStock" label="库存"> </el-table-column>
       <el-table-column label="操作">
-        <template slot-scope="">
-          <el-button type="danger" icon="el-icon-thumb">查看详情</el-button>
-          <el-button type="warning" icon="el-icon-bank-card"
+        <template slot-scope="scope">
+          <el-button type="danger" icon="el-icon-thumb" @click="showDetail">查看详情</el-button>
+          <el-button type="warning" icon="el-icon-bank-card" @click="buyNow(scope.row.id,currentpage)"
             >立即购买</el-button
           >
         </template>
@@ -75,6 +75,38 @@ export default {
           }
         );
     },
+    // 查看详情按钮点击事件
+    showDetail(){
+      alert("未开发，敬请等待")
+    },
+    // 立即购买
+    buyNow(id,curr){
+      axios.defaults.withCredentials = true;
+      axios.get(`http://localhost:8001/spike_system/order/buy/${id}`).then(
+          (req) => {
+            // 请求成功
+            if (req.data.code === 20000) {
+              this.$message("购买成功~");
+              // 再次查询
+              this.getData(curr)
+            } 
+            // 未登录
+            else if(req.data.code === 22222){
+              this.$message(req.data.message);
+              // 跳转登录
+              this.$router.push("/login");
+            }
+            // 其他错误
+            else {
+              this.$message("购买失败"+ req.data.message);
+            }
+          },
+          (error) => {
+            console.log(error.message);
+            this.$message("系统错误")
+          }
+        );
+    }
   },
   created() {
     // 首次调用请求，获取数据
