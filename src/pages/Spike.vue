@@ -1,6 +1,11 @@
 <template>
   <div class="show">
-    <el-table :data="goods" style="width: 100%">
+    <el-table 
+      :data="goods" 
+      style="width: 100%" 
+      v-loading="loading"
+      element-loading-text="拼命加载中"
+      >
       <el-table-column prop="skGoodName" label="名称" width="180">
       </el-table-column>
       <el-table-column prop="skGoodImg" label="图片" width="180">
@@ -33,7 +38,7 @@
             :disabled="isCanBuy(scope.row.startTime ,scope.row.endTime)"
             type="danger"
             icon="el-icon-thumb"
-            @click="submit(scope.row.goodId, currentpage)"
+            @click="submit(scope.row.id, currentpage)"
             >立即抢购</el-button
           >
         </template>
@@ -57,6 +62,8 @@ import axios from "axios";
 import moment from "moment";
 import CountDown from "../components/CountDown.vue";
 import OverTime from "../components/OverTime.vue";
+// 携带cookie
+axios.defaults.withCredentials = true;
 export default {
   name: "Spike",
   components: { CountDown, OverTime },
@@ -68,6 +75,7 @@ export default {
       currentpage: 1,
       // 标志按钮是否可以开始抢购
       isStart: true,
+      loading: false,
     };
   },
   methods: {
@@ -76,9 +84,8 @@ export default {
       // 再次调用请求获取数据(其实可以不这样做，因为数据已近全部获取到了)
       this.getData(val);
     },
+    // 获取页面信息
     getData() {
-      // 携带cookie
-      axios.defaults.withCredentials = true;
       axios.get(`http://localhost:8001/spike_system/skgoods/info`).then(
         (req) => {
           // console.log(curr, req.data);
@@ -107,28 +114,27 @@ export default {
     //     this.btnColor = "info"
     //   }
     // },
+    // 抢购请求
     submit(goodId, curr) {
-      axios.defaults.withCredentials = true;
       axios
         .get(`http://localhost:8001/spike_system/skorder/buy/${goodId}`)
         .then(
-          (req) => {
-            // console.log(curr, req);
+          (res) => {
+            // console.log(curr, res);
             // 请求成功
-            if (req.data.code === 20000) {
-              this.$message("购买成功~");
-              // 再次查询
-              this.getData(curr);
+            if (res.data.code === 22220) {
+              // 获取结果
+              this.getResult(curr,goodId)
             }
             // 未登录
-            else if (req.data.code === 22222) {
-              this.$message(req.data.message);
+            else if (res.data.code === 22222) {
+              this.$message(res.data.message);
               // 跳转登录
               this.$router.push("/login");
             }
             // 其他错误
             else {
-              this.$message("购买失败: " + req.data.message);
+              this.$message("购买失败: " + res.data.message);
             }
           },
           (error) => {
@@ -136,6 +142,42 @@ export default {
             this.$message("系统错误");
           }
         );
+    },
+    // 抢购请求后查询是否下单成功
+    getResult(curr,goodId){
+      // 显示加载
+      this.loading = true
+      // 查询是否下单成功
+      axios
+        .get(`http://localhost:8001/spike_system/skorder/confirm/${goodId}`)
+        .then(
+          res=>{
+            if(res.data.code == 23333){
+              setTimeout(()=>{   //设置延迟执行
+                  this.getResult(curr,goodId)
+              },1000);
+            }
+            else if(res.data.code == 20000){
+              this.$message("秒杀成功~");
+              // 关闭加载
+              this.loading = false
+              // 页面跳转
+              this.getData(curr);
+            }else{
+              this.$message(res.data.message);
+              // 关闭加载
+              this.loading = false
+              // 页面跳转
+              this.getData(curr);
+            }
+          },
+          error=>{
+            console.log(error)
+            this.$message("系统错误");
+            this.loading = false
+          }
+        )
+      curr + "a"
     },
     // 该方法用于改变购买按钮状态（是否可点击）
     isCanBuy(startTime,endTime) {
